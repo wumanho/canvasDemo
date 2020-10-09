@@ -11,20 +11,35 @@
 <body>
 <canvas id="canvas"></canvas>
 <script>
-    let canvas = document.getElementById("canvas");
-    canvas.width = document.documentElement.clientWidth;
-    canvas.height = document.documentElement.clientHeight;
-    //画线
+    //获取canvas元素
+    let canvas = document.getElementById("canvas")
+    canvas.width = document.documentElement.clientWidth
+    canvas.height = document.documentElement.clientHeight
     let ctx = canvas.getContext("2d")
+    //设置canvas填充颜色为蓝色，不设置边框
+    ctx.fillStyle = 'black'
 
+    //标记，为true即在画板上画画
     let painting = false
 
+    //判断是否移动设备
+    let isTouchDevice = 'ontouchstart' in document.documentElement
+    if (isTouchDevice){
+        canvas.ontouchmove = (e)=>{
+            let x = e.touches[0].clientX
+            let y = e.touches[0].clientY
+            ctx.beginPath()
+            ctx.arc(x,y,5,0,2 * Math.PI)
+            ctx.fill()
+        }
+    }
+    console.log('当前用户为pc端')
+    //监听鼠标事件
     canvas.onmousedown = ()=>{painting = true}
     canvas.onmouseup = ()=>{painting = false}
-
-    ctx.fillStyle = 'blue'
     canvas.onmousemove = (e)=>{
         if (painting){
+            //canvas画圆形
             ctx.beginPath()
             ctx.arc(e.clientX,e.clientY,5,0,2 * Math.PI)
             ctx.fill()
