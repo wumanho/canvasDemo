@@ -18,34 +18,62 @@
     let ctx = canvas.getContext("2d")
     //设置canvas填充颜色为蓝色，不设置边框
     ctx.fillStyle = 'black'
+    //线粗
+    ctx.lineWidth = 10;
+    //节点连接
+    ctx.lineCap = 'round'
+
+
+    //drawLine(0,0,500,500)
 
     //标记，为true即在画板上画画
     let painting = false
+    //记录鼠标上一次的坐标
+    let last
 
     //判断是否移动设备
     let isTouchDevice = 'ontouchstart' in document.documentElement
-    if (isTouchDevice){
-        canvas.ontouchmove = (e)=>{
+    if (isTouchDevice) {
+        //初始化last数组，当前last数组为第一次点击的坐标
+        canvas.ontouchstart = (e)=>{
+           let x =  e.touches[0].clientX
+           let y =  e.touches[0].clientY
+            last = [x,y]
+        }
+        //画线，只要不停更新last数组即可实现
+        canvas.ontouchmove = (e) => {
             let x = e.touches[0].clientX
             let y = e.touches[0].clientY
-            ctx.beginPath()
-            ctx.arc(x,y,5,0,2 * Math.PI)
-            ctx.fill()
+            drawLine(last[0], last[1], x, y)
+            last = [x,y]
         }
-    }
-    console.log('当前用户为pc端')
-    //监听鼠标事件
-    canvas.onmousedown = ()=>{painting = true}
-    canvas.onmouseup = ()=>{painting = false}
-    canvas.onmousemove = (e)=>{
-        if (painting){
-            //canvas画圆形
-            ctx.beginPath()
-            ctx.arc(e.clientX,e.clientY,5,0,2 * Math.PI)
-            ctx.fill()
+    }else{
+        console.log('当前用户为pc端')
+        //监听鼠标事件
+        canvas.onmousedown = (e) => {
+            painting = true
+            last = [e.clientX,e.clientY]
+        }
+        canvas.onmouseup = () => {
+            painting = false
+        }
+        canvas.onmousemove = (e) => {
+            if (painting) {
+                //画线
+                drawLine(last[0], last[1], e.clientX, e.clientY)
+                last[0] = e.clientX
+                last[1] = e.clientY
+            }
         }
     }
 
+    //函数，用于画线
+    function drawLine(x1, y1, x2, y2) {
+        ctx.beginPath()
+        ctx.moveTo(x1, y1)
+        ctx.lineTo(x2, y2)
+        ctx.stroke()
+    }
 </script>
 </body>
 </html>
